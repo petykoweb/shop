@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webshop Üzenőfal</title>
+    <script src="firebase-app.js"></script> <!-- Firebase, ha szükséges, különben eltávolítható -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #333;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+        }
+        .container {
+            width: 80%;
+            margin: 20px auto;
+        }
+        .products {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+        .product {
+            background-color: white;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .product img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+        .product button {
+            background-color: #28a745;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .product button:hover {
+            background-color: #218838;
+        }
+        .cart {
+            background-color: #fff;
+            padding: 20px;
+            margin-top: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .cart h2 {
+            margin-top: 0;
+        }
+        .cart ul {
+            list-style: none;
+            padding: 0;
+        }
+        .cart ul li {
+            margin-bottom: 10px;
+        }
+        .cart button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+        }
+        .cart button:hover {
+            background-color: #0056b3;
+        }
+        .message-board {
+            margin-top: 50px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .message-board h3 {
+            margin-top: 0;
+        }
+        .messages {
+            max-height: 300px;
+            overflow-y: auto;
+            border-top: 2px solid #ccc;
+            margin-top: 20px;
+        }
+        .message {
+            background-color: #e9ecef;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Webshop</h1>
+    </header>
+
+    <div class="container">
+        <h2>Termékek</h2>
+        <div class="products">
+            <div class="product" data-id="1">
+                <img src="https://via.placeholder.com/200" alt="Termék 1">
+                <h3>Termék 1</h3>
+                <p>1000 Ft</p>
+                <button onclick="addToCart(1, 'Termék 1', 1000)">Kosárba</button>
+            </div>
+            <div class="product" data-id="2">
+                <img src="https://via.placeholder.com/200" alt="Termék 2">
+                <h3>Termék 2</h3>
+                <p>1500 Ft</p>
+                <button onclick="addToCart(2, 'Termék 2', 1500)">Kosárba</button>
+            </div>
+            <div class="product" data-id="3">
+                <img src="https://via.placeholder.com/200" alt="Termék 3">
+                <h3>Termék 3</h3>
+                <p>2000 Ft</p>
+                <button onclick="addToCart(3, 'Termék 3', 2000)">Kosárba</button>
+            </div>
+        </div>
+
+        <div class="cart">
+            <h2>Kosár</h2>
+            <ul id="cart-items"></ul>
+            <p><strong>Összesen: <span id="total-price">0</span> Ft</strong></p>
+            <button onclick="generateCode()">Kód Generálás</button>
+        </div>
+
+        <div class="message-board">
+            <h3>Rendelések üzenőfala</h3>
+            <div class="messages" id="messages">
+                <!-- Itt jelennek meg az üzenetek -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let cart = [];
+        let totalPrice = 0;
+        const messagesContainer = document.getElementById('messages');
+
+        // Betöltjük a tárolt adatokat (ha vannak)
+        function loadStorage() {
+            const storedCart = localStorage.getItem('cart');
+            const storedMessages = localStorage.getItem('messages');
+
+            if (storedCart) {
+                cart = JSON.parse(storedCart);
+                totalPrice = cart.reduce((acc, item) => acc + item.price, 0);
+                updateCart();
+            }
+
+            if (storedMessages) {
+                const messages = JSON.parse(storedMessages);
+                messages.forEach(message => {
+                    addMessageToBoard(message);
+                });
+            }
+        }
+
+        // Kosár frissítése
+        function updateCart() {
+            const cartItemsList = document.getElementById("cart-items");
+            cartItemsList.innerHTML = ''; // Kosár kiürítése
+            cart.forEach(item => {
+                const li = document.createElement("li");
+                li.textContent = `${item.name} - ${item.price} Ft`;
+                cartItemsList.appendChild(li);
+            });
+
+            document.getElementById("total-price").textContent = totalPrice;
+
+            // Tároljuk a kosarat a localStorage-ban
+            localStorage.setItem('cart', JSON.stringify(cart));
+        }
+
+        // Kosárba helyezés
+        function addToCart(id, name, price) {
+            cart.push({ id, name, price });
+            totalPrice += price;
+
+            updateCart();
+        }
+
+        // Üzenet hozzáadása az üzenőfalhoz
+        function addMessageToBoard(message) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message');
+            messageDiv.innerHTML = message;
+            messagesContainer.prepend(messageDiv);
+        }
+
+        // Rendelési kód generálása és üzenet hozzáadása
+        function generateCode() {
+            if (cart.length === 0) {
+                alert("A kosarad üres!");
+                return;
+            }
+
+            // Rendelési kód generálása
+            const code = "WEB" + Math.random().toString(36).substr(2, 8).toUpperCase();
+            const customerName = prompt("Add meg a neved:"); // Vásárló neve
+
+            // Üzenet szöveg elkészítése
+            const message = `
+                <strong>${customerName}</strong> rendelte a következő termékeket:<br>
+                ${cart.map(item => `${item.name} - ${item.price} Ft`).join('<br>')}<br>
+                Kód: ${code}<br>
+                Összesen: ${totalPrice} Ft
+            `;
+
+            // Üzenet hozzáadása a falhoz
+            addMessageToBoard(message);
+
+            // Tároljuk az üzenetet a localStorage-ban
+            const storedMessages = localStorage.getItem('messages') ? JSON.parse(localStorage.getItem('messages')) : [];
+            storedMessages.push(message);
+            localStorage.setItem('messages', JSON.stringify(storedMessages));
+
+            // Kosár ürítése
+            cart = [];
+            totalPrice = 0;
+            updateCart();
+        }
+
+        // Oldal betöltésekor adat betöltés
+        loadStorage();
+    </script>
+</body>
+</html>
