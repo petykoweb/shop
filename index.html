@@ -6,10 +6,11 @@
     <title>Focis Kártyák Webshop</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Arial', sans-serif;
             background-color: #f4f4f4;
             margin: 0;
             padding: 0;
+            transition: background-color 0.3s ease;
         }
 
         header {
@@ -17,34 +18,50 @@
             color: white;
             text-align: center;
             padding: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
         h1 {
             margin: 0;
+            font-size: 2em;
         }
 
         .product-container {
             display: grid;
-            grid-template-columns: repeat(5, 1fr);
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
             gap: 20px;
             padding: 20px;
+            transition: all 0.3s ease-in-out;
         }
 
         .product-card {
             background-color: white;
-            border-radius: 8px;
+            border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             padding: 20px;
             text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .product-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
         }
 
         .product-card img {
             max-width: 100%;
-            border-radius: 8px;
+            border-radius: 10px;
+            transition: transform 0.3s ease;
+        }
+
+        .product-card img:hover {
+            transform: scale(1.1);
         }
 
         .product-card h3 {
             margin: 10px 0;
+            font-size: 1.2em;
+            color: #333;
         }
 
         .product-card p {
@@ -54,7 +71,7 @@
         .description {
             padding: 20px;
             background-color: #fff;
-            border-radius: 8px;
+            border-radius: 10px;
             margin: 20px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
@@ -67,6 +84,32 @@
             position: fixed;
             width: 100%;
             bottom: 0;
+        }
+
+        /* Hover gombok */
+        button {
+            padding: 10px 20px;
+            font-size: 1em;
+            color: white;
+            background-color: #4CAF50;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        /* Ismertető szöveg szépítése */
+        .description ul {
+            list-style-type: square;
+            color: #555;
+        }
+
+        .description ul li {
+            margin: 5px 0;
         }
     </style>
 </head>
@@ -81,175 +124,137 @@
         <!-- Termékek -->
         <div class="product-card">
             <img src="product1.jpg" alt="Termék 1">
-            <h3>mgk 2020/21</h3>
+            <h3>1. mgk 2020/21</h3>
             <p>Raktáron van.</p>
             <p>Ár: 1300 Ft</p>
+            <button>Vásárlás</button>
         </div>
         <div class="product-card">
             <img src="product2.jpg" alt="Termék 2">
-            <h3>mgk 2021/22</h3>
-            <p>Raktáron van..</p>
+            <h3>2. mgk 2021/22</h3>
+            <p>Raktáron van.</p>
             <p>Ár: 1100 Ft</p>
+            <button>Vásárlás</button>
         </div>
         <div class="product-card">
             <img src="product3.jpg" alt="Termék 3">
-            <h3>mgk 2024/25</h3>
+            <h3>3. mgk 2024/25</h3>
             <p>Raktáron van.</p>
             <p>Ár: 950 Ft</p>
+            <button>Vásárlás</button>
         </div>
         <div class="product-card">
             <img src="product4.jpg" alt="Termék 4">
-            <h3>Star Wars</h3>
+            <h3>4. Star Wars</h3>
             <p>Raktáron van.</p>
-            <p>Ár: 950 Ft</p>
+            <p>Ár: 1200 Ft</p>
+            <button>Vásárlás</button>
         </div>
         <div class="product-card">
-            <img src="product5.jpg" alt="Termék 5">
-            <h3>---</h3>
-            <p>---</p>
-            <p>---</p>
-        </div>
-        <div class="product-card">
-            <img src="product6.jpg" alt="Termék 6">
-            <h3>---</h3>
-            <p>---</p>
-            <p>---</p>
-        </div>
-        <div class="product-card">
-            <img src="product7.jpg" alt="Termék 7">
-            <h3>Dragonball</h3>
+            <img src="product7.jpg" alt="Termék 5">
+            <h3>5. Dragonball</h3>
             <p>Raktáron van.</p>
             <p>Ár: 1500 Ft</p>
+            <button>Vásárlás</button>
         </div>
         <div class="product-card">
-            <img src="product8.jpg" alt="Termék 8">
-            <h3>Pokemon back to school</h3>
+            <img src="product8.jpg" alt="Termék 6">
+            <h3>6. Pokemon back to school</h3>
             <p>Raktáron van.</p>
             <p>Ár: 4500 Ft</p>
+            <button>Vásárlás</button>
         </div>
         <div class="product-card">
-            <img src="product9.jpg" alt="Termék 9">
-            <h3>Mordic</h3> euro 2021</h3>
+            <img src="product9.jpg" alt="Termék 7">
+            <h3>7. Mordic</h3>
             <p>Raktáron van.</p>
             <p>Ár: 4500 Ft</p>
+            <button>Vásárlás</button>
+        </div>
+        <div class="product-card">
+            <img src="product10.jpg" alt="Termék 8">
+            <h3>8. Nba Hops box 2022/23</h3>
+            <p>Raktáron van.</p>
+            <p>Ár: 16000 Ft</p>
+            <button>Vásárlás</button>
+        </div>
+        <div class="product-card">
+            <img src="product10.jpg" alt="Termék 9">
+            <h3>9. Space Jam</h3>
+            <p>Raktáron van.</p>
+            <p>Ár: 1500 Ft</p>
+            <button>Vásárlás</button>
         </div>
         <div class="product-card">
             <img src="product10.jpg" alt="Termék 10">
-            <h3>Nba Hops box 2022/23</h3>
+            <h3>10. Super Stars</h3>
             <p>Raktáron van.</p>
-            <p>Ár: 16000 Ft</p>
+            <p>1250 Ft/db</p>
+            <button>Vásárlás</button>
         </div>
         <div class="product-card">
             <img src="product10.jpg" alt="Termék 11">
-            <h3>Space Jam</h3>
+            <h3>11. Topps Ucc</h3>
             <p>Raktáron van.</p>
-            <p>Ár: 1500 Ft</p>
+            <p>Ár: 15900 Ft</p>
+            <button>Vásárlás</button>
         </div>
-        
         <div class="product-card">
             <img src="product10.jpg" alt="Termék 12">
-            <h3>Super Stars</h3>
+            <h3>12. nfl hockey</h3>
             <p>Raktáron van.</p>
-            <p>  1250/db</p>
+            <p>Ár: 1900 Ft</p>
+            <button>Vásárlás</button>
         </div>
         <div class="product-card">
             <img src="product10.jpg" alt="Termék 13">
-            <h3>Topps Ucc</h3>
+            <h3>13. Crystal</h3>
             <p>Raktáron van.</p>
-            <p>Ár: 15900 Ft</p>
+            <p>Ár: 1500 Ft</p>
+            <button>Vásárlás</button>
         </div>
         <div class="product-card">
             <img src="product10.jpg" alt="Termék 14">
-            <h3>nfl hockey</h3>
+            <h3>14. Match Attax 101</h3>
             <p>Raktáron van.</p>
-            <p>Ár: 1900 Ft</p>
+            <p>Ár: 550 Ft</p>
+            <button>Vásárlás</button>
         </div>
         <div class="product-card">
             <img src="product10.jpg" alt="Termék 15">
-            <h3>---</h3>
-            <p>---</p>
-            <p>---</p>
+            <h3>15. Topps Ucc 2022/23</h3>
+            <p>Raktáron van.</p>
+            <p>Ár: 1500 Ft</p>
+            <button>Vásárlás</button>
         </div>
         <div class="product-card">
             <img src="product10.jpg" alt="Termék 16">
-            <h3>---</h3>
-            <p>---</p>
-            <p>---</p>
+            <h3>16. Score kék 2021/22</h3>
+            <p>Raktáron van.</p>
+            <p>Ár: 1700 Ft</p>
+            <button>Vásárlás</button>
         </div>
         <div class="product-card">
             <img src="product10.jpg" alt="Termék 17">
-            <h3>Crystal</h3>
+            <h3>17. Score 2022/23 zöld</h3>
             <p>Raktáron van.</p>
-            <p>Ár: 1500 Ft</p>
+            <p>Ár: 1800 Ft</p>
+            <button>Vásárlás</button>
         </div>
         <div class="product-card">
             <img src="product10.jpg" alt="Termék 18">
-            <h3>Match Attax 101</h3>
+            <h3>18. Pokember</h3>
             <p>Raktáron van.</p>
-            <p>Ár: 550 Ft</p>
+            <p>Ár: 1550 Ft</p>
+            <button>Vásárlás</button>
         </div>
         <div class="product-card">
             <img src="product10.jpg" alt="Termék 19">
-            <h3>---</h3>
-            <p>---</p>
-            <p>---</p>
-        </div>
-        <div class="product-card">
-            <img src="product10.jpg" alt="Termék 20">
-            <h3>---</h3>
-            <p>---</p>
-            <p>---</p>
-        </div>
-        <div class="product-card">
-            <img src="product10.jpg" alt="Termék 21">
-            <h3>---</h3>
-            <p>---</p>
-            <p>---</p>
-        </div>
-        <div class="product-card">
-            <img src="product10.jpg" alt="Termék 22">
-            <h3>---</h3>
-            <p>---</p>
-            <p>---</p>
-        </div>
-        <div class="product-card">
-            <img src="product10.jpg" alt="Termék 23">
-            <h3>Topps Ucc 2022/23</h3>
-            <p>Raktáron van.</p>
-            <p>Ár: 1500 Ft</p>
-        </div>
-        <div class="product-card">
-            <img src="product10.jpg" alt="Termék 24">
-            <h3>Score kék 2021/22</h3>
-            <p>Raktáron van.</p>
-            <p>Ár: 1700 Ft</p>
-        </div>
-        <div class="product-card">
-            <img src="product10.jpg" alt="Termék 25">
-            <h3>Score 2022/23 zöld</h3>
-            <p>Raktáron van.</p>
-            <p>Ár: 1800 Ft</p>
-        </div>
-        <div class="product-card">
-            <img src="product10.jpg" alt="Termék 26">
-            <h3>---</h3>
-            <p>---</p>
-            <p>---</p>
-        </div>
-        <div class="product-card">
-            <img src="product10.jpg" alt="Termék 27">
-            <h3>Pokember</h3>
-            <p>Raktáron van.</p>
-            <p>Ár: 1550 Ft</p>
-        </div>
-        <div class="product-card">
-            <img src="product10.jpg" alt="Termék 28">
-            <h3>Donruss Laliga</h3>
+            <h3>19. Donruss Laliga</h3>
             <p>Raktáron van.</p>
             <p>Ár: 2150 Ft</p>
+            <button>Vásárlás</button>
         </div>
-        
-        
     </div>
 
     <!-- Ismertető Szöveg -->
