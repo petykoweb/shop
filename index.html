@@ -3,278 +3,174 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Focis Kártyák Webshop</title>
+    <title>Webshop</title>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <style>
         body {
-            font-family: 'Arial', sans-serif;
+            font-family: Arial, sans-serif;
             background-color: #f4f4f4;
-            margin: 0;
-            padding: 0;
-            transition: background-color 0.3s ease;
-        }
-
-        header {
-            background-color: #333;
-            color: white;
             text-align: center;
-            padding: 15px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        h1 {
             margin: 0;
-            font-size: 2em;
+            padding: 20px;
         }
-
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
         .product-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 20px;
-            padding: 20px;
-            transition: all 0.3s ease-in-out;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
         }
-
         .product-card {
-            background-color: white;
+            border: 1px solid #ddd;
             border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            text-align: center;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .product-card:hover {
-            transform: scale(1.05);
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-        }
-
-        .product-card img {
-            max-width: 100%;
-            border-radius: 10px;
-            transition: transform 0.3s ease;
-        }
-
-        .product-card img:hover {
-            transform: scale(1.1);
-        }
-
-        .product-card h3 {
-            margin: 10px 0;
-            font-size: 1.2em;
-            color: #333;
-        }
-
-        .product-card p {
-            color: #888;
-        }
-
-        .description {
-            padding: 20px;
-            background-color: #fff;
-            border-radius: 10px;
-            margin: 20px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        footer {
-            background-color: #333;
-            color: white;
-            text-align: center;
             padding: 10px;
-            position: fixed;
-            width: 100%;
-            bottom: 0;
+            margin: 10px;
+            background: #fff;
+            text-align: center;
+            width: 200px;
         }
-
-        /* Hover gombok */
+        .product-card img {
+            width: 100px;
+            height: auto;
+        }
         button {
-            padding: 10px 20px;
-            font-size: 1em;
+            padding: 10px 15px;
+            background: #28a745;
             color: white;
-            background-color: #4CAF50;
             border: none;
-            border-radius: 5px;
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            border-radius: 5px;
         }
-
         button:hover {
-            background-color: #45a049;
+            background: #218838;
         }
-
-        /* Ismertető szöveg szépítése */
-        .description ul {
-            list-style-type: square;
-            color: #555;
+        .order-btn {
+            margin-top: 20px;
+            background: #007bff;
         }
-
-        .description ul li {
-            margin: 5px 0;
+        .order-btn:hover {
+            background: #0056b3;
+        }
+        .cart {
+            margin-top: 20px;
+            padding: 10px;
+            background: #f9f9f9;
+            border-radius: 10px;
         }
     </style>
+    <script>
+        emailjs.init("uO9ZiOSBCkDFXWLh4"); // EmailJS inicializálása SMTP-vel
+        
+        let cart = JSON.parse(localStorage.getItem("cart")) || [];
+        
+        function addToCart(name, price) {
+            cart.push({ name, price });
+            localStorage.setItem("cart", JSON.stringify(cart));
+            updateCartView();
+        }
+        
+        function updateCartView() {
+            let cartContainer = document.getElementById("cart");
+            cartContainer.innerHTML = "<h2>Kosár</h2>";
+            if (cart.length === 0) {
+                cartContainer.innerHTML += "<p>A kosár üres.</p>";
+                return;
+            }
+            cart.forEach((item, index) => {
+                cartContainer.innerHTML += `<div class='cart-item'>
+                    <span>${item.name} - ${item.price} Ft</span>
+                    <button onclick='removeFromCart(${index})'>Törlés</button>
+                </div>`;
+            });
+        }
+        
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            localStorage.setItem("cart", JSON.stringify(cart));
+            updateCartView();
+        }
+        
+        function sendOrder() {
+            if (cart.length === 0) {
+                alert("A kosár üres!");
+                return;
+            }
+            
+            let customerName = prompt("Kérlek add meg a neved:");
+            if (!customerName) {
+                alert("A név megadása kötelező!");
+                return;
+            }
+            
+            let cartData = cart.map(item => `${item.name} - ${item.price} Ft`).join("\n");
+            
+            let templateParams = {
+                name: customerName,
+                message: cartData,
+                email: "petykopetyko3@gmail.com"
+            };
+            
+            emailjs.send("service_kyybcza", "template_o12ky0r", templateParams)
+                .then(response => {
+                    alert("Rendelés elküldve SMTP-n keresztül!");
+                    localStorage.removeItem("cart");
+                    cart = [];
+                    updateCartView();
+                }, error => {
+                    alert("Hiba történt: " + error.text);
+                });
+        }
+        
+        window.onload = updateCartView;
+    </script>
 </head>
 <body>
-
-<header>
-    <h1>Focis Kártyák Webshop</h1>
-</header>
-
-<main>
-    <div class="product-container">
-        <!-- Termékek -->
-        <div class="product-card">
-            <img src="product1.jpg" alt="Termék 1">
-            <h3>1. mgk 2020/21</h3>
-            <p>Raktáron van.</p>
-            <p>Ár: 1300 Ft</p>
-            <button>Vásárlás</button>
+    <div class="container">
+        <h1>Webshop</h1>
+        <div class="product-container">
+            <script>
+                const products = [
+                    { name: "mgk 2020/21", price: 1300 },
+                    { name: "mgk 2021/22", price: 1100 },
+                    { name: "mgk 2024/25", price: 950 },
+                    { name: "Star Wars", price: 1200 },
+                    { name: "Dragonball", price: 1500 },
+                    { name: "Pokemon back to school", price: 4500 },
+                    { name: "Mordic", price: 4500 },
+                    { name: "Nba Hops box 2022/23", price: 16000 },
+                    { name: "Space Jam", price: 1500 },
+                    { name: "Super Stars", price: 1250 },
+                    { name: "Topps Ucc", price: 15900 },
+                    { name: "nfl hockey", price: 1900 },
+                    { name: "Crystal", price: 1500 },
+                    { name: "Match Attax 101", price: 550 },
+                    { name: "Topps Ucc 2022/23", price: 1500 },
+                    { name: "Score kék 2021/22", price: 1700 },
+                    { name: "Score 2022/23 zöld", price: 1800 },
+                    { name: "Pokember", price: 1550 },
+                    { name: "Donruss Laliga", price: 2150 }
+                ];
+                
+                products.forEach((product, index) => {
+                    document.write(`
+                        <div class="product-card">
+                            <img src="product${index + 1}.jpg" alt="Termék ${index + 1}">
+                            <h3>${index + 1}. ${product.name}</h3>
+                            <p>Ár: ${product.price} Ft</p>
+                            <button onclick="addToCart('${product.name}', ${product.price})">Kosárba</button>
+                        </div>
+                    `);
+                });
+            </script>
         </div>
-        <div class="product-card">
-            <img src="product2.jpg" alt="Termék 2">
-            <h3>2. mgk 2021/22</h3>
-            <p>Raktáron van.</p>
-            <p>Ár: 1100 Ft</p>
-            <button>Vásárlás</button>
-        </div>
-        <div class="product-card">
-            <img src="product3.jpg" alt="Termék 3">
-            <h3>3. mgk 2024/25</h3>
-            <p>Raktáron van.</p>
-            <p>Ár: 950 Ft</p>
-            <button>Vásárlás</button>
-        </div>
-        <div class="product-card">
-            <img src="product4.jpg" alt="Termék 4">
-            <h3>4. Star Wars</h3>
-            <p>Raktáron van.</p>
-            <p>Ár: 1200 Ft</p>
-            <button>Vásárlás</button>
-        </div>
-        <div class="product-card">
-            <img src="product7.jpg" alt="Termék 5">
-            <h3>5. Dragonball</h3>
-            <p>Raktáron van.</p>
-            <p>Ár: 1500 Ft</p>
-            <button>Vásárlás</button>
-        </div>
-        <div class="product-card">
-            <img src="product8.jpg" alt="Termék 6">
-            <h3>6. Pokemon back to school</h3>
-            <p>Raktáron van.</p>
-            <p>Ár: 4500 Ft</p>
-            <button>Vásárlás</button>
-        </div>
-        <div class="product-card">
-            <img src="product9.jpg" alt="Termék 7">
-            <h3>7. Mordic</h3>
-            <p>Raktáron van.</p>
-            <p>Ár: 4500 Ft</p>
-            <button>Vásárlás</button>
-        </div>
-        <div class="product-card">
-            <img src="product10.jpg" alt="Termék 8">
-            <h3>8. Nba Hops box 2022/23</h3>
-            <p>Raktáron van.</p>
-            <p>Ár: 16000 Ft</p>
-            <button>Vásárlás</button>
-        </div>
-        <div class="product-card">
-            <img src="product10.jpg" alt="Termék 9">
-            <h3>9. Space Jam</h3>
-            <p>Raktáron van.</p>
-            <p>Ár: 1500 Ft</p>
-            <button>Vásárlás</button>
-        </div>
-        <div class="product-card">
-            <img src="product10.jpg" alt="Termék 10">
-            <h3>10. Super Stars</h3>
-            <p>Raktáron van.</p>
-            <p>1250 Ft/db</p>
-            <button>Vásárlás</button>
-        </div>
-        <div class="product-card">
-            <img src="product10.jpg" alt="Termék 11">
-            <h3>11. Topps Ucc</h3>
-            <p>Raktáron van.</p>
-            <p>Ár: 15900 Ft</p>
-            <button>Vásárlás</button>
-        </div>
-        <div class="product-card">
-            <img src="product10.jpg" alt="Termék 12">
-            <h3>12. nfl hockey</h3>
-            <p>Raktáron van.</p>
-            <p>Ár: 1900 Ft</p>
-            <button>Vásárlás</button>
-        </div>
-        <div class="product-card">
-            <img src="product10.jpg" alt="Termék 13">
-            <h3>13. Crystal</h3>
-            <p>Raktáron van.</p>
-            <p>Ár: 1500 Ft</p>
-            <button>Vásárlás</button>
-        </div>
-        <div class="product-card">
-            <img src="product10.jpg" alt="Termék 14">
-            <h3>14. Match Attax 101</h3>
-            <p>Raktáron van.</p>
-            <p>Ár: 550 Ft</p>
-            <button>Vásárlás</button>
-        </div>
-        <div class="product-card">
-            <img src="product10.jpg" alt="Termék 15">
-            <h3>15. Topps Ucc 2022/23</h3>
-            <p>Raktáron van.</p>
-            <p>Ár: 1500 Ft</p>
-            <button>Vásárlás</button>
-        </div>
-        <div class="product-card">
-            <img src="product10.jpg" alt="Termék 16">
-            <h3>16. Score kék 2021/22</h3>
-            <p>Raktáron van.</p>
-            <p>Ár: 1700 Ft</p>
-            <button>Vásárlás</button>
-        </div>
-        <div class="product-card">
-            <img src="product10.jpg" alt="Termék 17">
-            <h3>17. Score 2022/23 zöld</h3>
-            <p>Raktáron van.</p>
-            <p>Ár: 1800 Ft</p>
-            <button>Vásárlás</button>
-        </div>
-        <div class="product-card">
-            <img src="product10.jpg" alt="Termék 18">
-            <h3>18. Pokember</h3>
-            <p>Raktáron van.</p>
-            <p>Ár: 1550 Ft</p>
-            <button>Vásárlás</button>
-        </div>
-        <div class="product-card">
-            <img src="product10.jpg" alt="Termék 19">
-            <h3>19. Donruss Laliga</h3>
-            <p>Raktáron van.</p>
-            <p>Ár: 2150 Ft</p>
-            <button>Vásárlás</button>
-        </div>
+        <div id="cart" class="cart"></div>
+        <button class="order-btn" onclick="sendOrder()">Rendelés leadása</button>
     </div>
-
-    <!-- Ismertető Szöveg -->
-    <div class="description">
-        <h2>Ismertető</h2>
-        <p>Üdvözlünk a Focis Kártyák Webshopban! Itt különféle focis kártyákat találsz, amelyek tökéletesek a gyűjtők számára. Kínálatunkban megtalálhatók különleges kártyák a legnagyobb focistákról, legendás mérkőzésekről és egyéb izgalmas tartalmakról.</p>
-        <p>Miért érdemes nálunk vásárolni?</p>
-        <ul>
-            <li>Széles választék</li>
-            <li>Minőségi termékek</li>
-            <li>Gyors szállítás</li>
-            <li>Garantált elégedettség</li>
-        </ul>
-        <p>Ha bármilyen kérdésed van a termékekkel kapcsolatban, ne habozz kapcsolatba lépni velünk. További részletekért és ajánlatokért kövess minket a közösségi médiában!</p>
-    </div>
-</main>
-
-<footer>
-    <p>&copy; 2025 Focis Kártyák Webshop</p>
-</footer>
-
 </body>
 </html>
