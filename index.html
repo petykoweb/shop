@@ -82,12 +82,15 @@
                 cartContainer.innerHTML += "<p>A kosár üres.</p>";
                 return;
             }
+            let total = 0;
             cart.forEach((item, index) => {
+                total += item.price;
                 cartContainer.innerHTML += `<div class='cart-item'>
                     <span>${item.name} - ${item.price} Ft</span>
                     <button onclick='removeFromCart(${index})'>Törlés</button>
                 </div>`;
             });
+            cartContainer.innerHTML += `<h3>Összesen: ${total} Ft</h3>`;
         }
         
         function removeFromCart(index) {
@@ -109,10 +112,11 @@
             }
             
             let cartData = cart.map(item => `${item.name} - ${item.price} Ft`).join("\n");
+            let total = cart.reduce((sum, item) => sum + item.price, 0);
             
             let templateParams = {
-                name: customerName,
-                message: cartData,
+                user_name: customerName,
+                message: `Vásárló neve: ${customerName}\n\nRendelés:\n${cartData}\n\nÖsszesen: ${total} Ft`,
                 email: "petykopetyko3@gmail.com"
             };
             
@@ -156,12 +160,10 @@
                     { name: "Pokember", price: 1550 },
                     { name: "Donruss Laliga", price: 2150 }
                 ];
-                
-                products.forEach((product, index) => {
+                products.forEach(product => {
                     document.write(`
                         <div class="product-card">
-                            <img src="product${index + 1}.jpg" alt="Termék ${index + 1}">
-                            <h3>${index + 1}. ${product.name}</h3>
+                            <h3>${product.name}</h3>
                             <p>Ár: ${product.price} Ft</p>
                             <button onclick="addToCart('${product.name}', ${product.price})">Kosárba</button>
                         </div>
