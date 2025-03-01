@@ -6,7 +6,7 @@
     <title>Webshop</title>
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 
-        <style>
+    <style>
         .custom-button {
             background-color: #007bff;
             color: white;
@@ -21,9 +21,6 @@
         .custom-button:hover {
             background-color: #0056b3;
         }
-    </style>
-    <style>
-    
         body {
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
@@ -38,6 +35,9 @@
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .search-box {
+            margin-bottom: 20px;
         }
         .product-container {
             display: flex;
@@ -82,17 +82,40 @@
             border-radius: 10px;
         }
     </style>
+    
     <script>
-        emailjs.init("uO9ZiOSBCkDFXWLh4"); // EmailJS inicializálása SMTP-vel
-        
+        emailjs.init("uO9ZiOSBCkDFXWLh4");
+
         let cart = JSON.parse(localStorage.getItem("cart")) || [];
-        
+        let products = [
+            { name: "mgk 2020/21", price: 1300 },
+            { name: "mgk 2021/22", price: 1100 },
+            { name: "mgk 2024/25", price: 950 },
+            { name: "Star Wars", price: 1200 },
+            { name: "Dragonball", price: 1500 },
+            { name: "Pokemon back to school", price: 4500 },
+            { name: "Mordic", price: 4500 },
+            { name: "Nba Hops box 2022/23", price: 16000 },
+            { name: "Space Jam", price: 1500 },
+            { name: "Super Stars", price: 1250 },
+            { name: "Topps Ucc", price: 15900 },
+            { name: "nfl hockey", price: 1900 },
+            { name: "Crystal", price: 1500 },
+            { name: "Match Attax 101", price: 550 },
+            { name: "Topps Ucc 2022/23", price: 1500 },
+            { name: "Score kék 2021/22", price: 1700 },
+            { name: "Score 2022/23 zöld", price: 1800 },
+            { name: "Pokember", price: 1550 },
+            { name: "Laliga", price: 2150 },
+            { name: "Pokemon Sieller Crown", price: 1600 }
+        ];
+
         function addToCart(name, price) {
             cart.push({ name, price });
             localStorage.setItem("cart", JSON.stringify(cart));
             updateCartView();
         }
-        
+
         function updateCartView() {
             let cartContainer = document.getElementById("cart");
             cartContainer.innerHTML = "<h2>Kosár</h2>";
@@ -110,13 +133,13 @@
             });
             cartContainer.innerHTML += `<h3>Összesen: ${total} Ft</h3>`;
         }
-        
+
         function removeFromCart(index) {
             cart.splice(index, 1);
             localStorage.setItem("cart", JSON.stringify(cart));
             updateCartView();
         }
-        
+
         function sendOrder() {
             if (cart.length === 0) {
                 alert("A kosár üres!");
@@ -140,7 +163,7 @@
             
             emailjs.send("service_kyybcza", "template_o12ky0r", templateParams)
                 .then(response => {
-                    alert("Rendelés elküldve SMTP-n keresztül!");
+                    alert("Rendelés elküldve!");
                     localStorage.removeItem("cart");
                     cart = [];
                     updateCartView();
@@ -148,52 +171,41 @@
                     alert("Hiba történt: " + error.text);
                 });
         }
-        
-        window.onload = updateCartView;
-    </script>
-</head>
-<body>
 
-    <a href="https://petykoweb.github.io/bolt/" class="custom-button">Vissza a fő oldalra</a>
-    <div class="container">
-        <h1>Webshop</h1>
-        <div class="product-container">
-            <script>
-                const products = [
-                    { name: "mgk 2020/21", price: 1300 },
-                    { name: "mgk 2021/22", price: 1100 },
-                    { name: "mgk 2024/25", price: 950 },
-                    { name: "Star Wars", price: 1200 },
-                    { name: "Dragonball", price: 1500 },
-                    { name: "Pokemon back to school", price: 4500 },
-                    { name: "Mordic", price: 4500 },
-                    { name: "Nba Hops box 2022/23", price: 16000 },
-                    { name: "Space Jam", price: 1500 },
-                    { name: "Super Stars", price: 1250 },
-                    { name: "Topps Ucc", price: 15900 },
-                    { name: "nfl hockey", price: 1900 },
-                    { name: "Crystal", price: 1500 },
-                    { name: "Match Attax 101", price: 550 },
-                    { name: "Topps Ucc 2022/23", price: 1500 },
-                    { name: "Score kék 2021/22", price: 1700 },
-                    { name: "Score 2022/23 zöld", price: 1800 },
-                    { name: "Pokember", price: 1550 },
-                    { name: "Laliga", price: 2150 },
-                    { name: "Pokemon Sieller Crown ", price: 1600 }
-                ];
-                products.forEach(product => {
-                    document.write(`
+        function searchProducts() {
+            let searchValue = document.getElementById("search").value.toLowerCase();
+            let productContainer = document.querySelector(".product-container");
+            productContainer.innerHTML = "";
+            products.forEach(product => {
+                if (product.name.toLowerCase().includes(searchValue)) {
+                    productContainer.innerHTML += `
                         <div class="product-card">
                             <h3>${product.name}</h3>
                             <p>Ár: ${product.price} Ft</p>
                             <button onclick="addToCart('${product.name}', ${product.price})">Kosárba</button>
-                        </div>
-                    `);
-                });
-            </script>
-        </div>
+                        </div>`;
+                }
+            });
+        }
+
+        window.onload = function () {
+            updateCartView();
+            searchProducts();
+        };
+    </script>
+</head>
+<body>
+
+    <input type="text" id="search" onkeyup="searchProducts()" placeholder="Keresés termékek között..." class="search-box">
+    
+    <a href="https://petykoweb.github.io/bolt/" class="custom-button">Vissza a fő oldalra</a>
+    
+    <div class="container">
+        <h1>Webshop</h1>
+        <div class="product-container"></div>
         <div id="cart" class="cart"></div>
         <button class="order-btn" onclick="sendOrder()">Rendelés leadása</button>
     </div>
+
 </body>
 </html>
