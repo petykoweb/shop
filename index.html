@@ -214,6 +214,10 @@
 
         let appliedCoupon = null;
 
+        // Felhasználó szintje és kedvezményei
+        let userLevel = 0; // 0: Új vásárló, 1: Alkalmi gyűjtő, stb.
+        let userDiscount = 0; // Szint alapján kapott kedvezmény
+
         function addToCart(name, price) {
             cart.push({ name, price });
             localStorage.setItem("cart", JSON.stringify(cart));
@@ -236,24 +240,38 @@
                 </div>`;
             });
 
-            let discount = 0;
+            // Webes kedvezmények
+            let webDiscount = 0;
             if (total >= 10000) {
-                discount = total * 0.06;
+                webDiscount = total * 0.07; // 7% kedvezmény 10000 Ft felett
             } else if (total >= 5000) {
-                discount = total * 0.05;
+                webDiscount = total * 0.06; // 6% kedvezmény 5000 Ft felett
+            } else if (total >= 2500) {
+                webDiscount = 170; // 170 Ft kedvezmény 2500 Ft felett
             }
 
+            // Kuponkód kedvezmény
+            let couponDiscount = 0;
             if (appliedCoupon) {
-                let couponDiscount = total * appliedCoupon.discount;
-                discount += couponDiscount;
-                cartContainer.innerHTML += `<h3>Kuponkód (${appliedCoupon.code}): -${couponDiscount} Ft</h3>`;
+                couponDiscount = total * appliedCoupon.discount;
             }
 
-            let finalTotal = total - discount;
+            // Felhasználó szintjének kedvezménye
+            let levelDiscount = total * userDiscount;
+
+            // Összes kedvezmény
+            let totalDiscount = webDiscount + couponDiscount + levelDiscount;
+            let finalTotal = total - totalDiscount;
 
             cartContainer.innerHTML += `<h3>Összesen: ${total} Ft</h3>`;
-            if (discount > 0) {
-                cartContainer.innerHTML += `<h3>Kedvezmény: -${discount} Ft</h3>`;
+            if (webDiscount > 0) {
+                cartContainer.innerHTML += `<h3>Webes kedvezmény: -${webDiscount} Ft</h3>`;
+            }
+            if (couponDiscount > 0) {
+                cartContainer.innerHTML += `<h3>Kuponkód (${appliedCoupon.code}): -${couponDiscount} Ft</h3>`;
+            }
+            if (levelDiscount > 0) {
+                cartContainer.innerHTML += `<h3>Szint kedvezmény (${userLevel}. szint): -${levelDiscount} Ft</h3>`;
             }
             cartContainer.innerHTML += `<h3>Fizetendő: ${finalTotal} Ft</h3>`;
         }
@@ -293,22 +311,32 @@
             let cartData = cart.map(item => `${item.name} - ${item.price} Ft`).join("\n");
             let total = cart.reduce((sum, item) => sum + item.price, 0);
             
-            let discount = 0;
+            // Webes kedvezmények
+            let webDiscount = 0;
             if (total >= 10000) {
-                discount = total * 0.06;
+                webDiscount = total * 0.07;
             } else if (total >= 5000) {
-                discount = total * 0.05;
+                webDiscount = total * 0.06;
+            } else if (total >= 2500) {
+                webDiscount = 170;
             }
 
+            // Kuponkód kedvezmény
+            let couponDiscount = 0;
             if (appliedCoupon) {
-                discount += total * appliedCoupon.discount;
+                couponDiscount = total * appliedCoupon.discount;
             }
 
-            let finalTotal = total - discount;
+            // Felhasználó szintjének kedvezménye
+            let levelDiscount = total * userDiscount;
+
+            // Összes kedvezmény
+            let totalDiscount = webDiscount + couponDiscount + levelDiscount;
+            let finalTotal = total - totalDiscount;
 
             let templateParams = {
                 user_name: customerName,
-                message: `Vásárló neve: ${customerName}\n\nRendelés:\n${cartData}\n\nÖsszesen: ${total} Ft\nKedvezmény: -${discount} Ft\nFizetendő: ${finalTotal} Ft`,
+                message: `Vásárló neve: ${customerName}\n\nRendelés:\n${cartData}\n\nÖsszesen: ${total} Ft\nWebes kedvezmény: -${webDiscount} Ft\nKuponkód kedvezmény: -${couponDiscount} Ft\nSzint kedvezmény: -${levelDiscount} Ft\nFizetendő: ${finalTotal} Ft`,
                 email: "petykopetyko3@gmail.com"
             };
             
