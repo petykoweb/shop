@@ -5,84 +5,180 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Webshop</title>
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
-        .custom-button {
-            background-color: #007bff;
-            color: white;
-            padding: 10px 20px;
-            font-size: 16px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-block;
-        }
-        .custom-button:hover {
-            background-color: #0056b3;
-        }
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            text-align: center;
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
             margin: 0;
-            padding: 20px;
+            padding: 0;
         }
         .container {
-            max-width: 800px;
-            margin: auto;
-            background: white;
+            max-width: 1200px;
+            margin: 20px auto;
             padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
         }
         .search-box {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
             margin-bottom: 20px;
+            transition: border-color 0.3s ease;
+        }
+        .search-box:focus {
+            border-color: #007bff;
+            outline: none;
         }
         .product-container {
             display: flex;
             flex-wrap: wrap;
+            gap: 20px;
             justify-content: center;
         }
         .product-card {
-            border: 1px solid #ddd;
-            border-radius: 10px;
-            padding: 10px;
-            margin: 10px;
             background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 20px;
+            width: 220px;
             text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+        }
+        .product-card h3 {
+            font-size: 1.2rem;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .product-card p {
+            font-size: 1rem;
+            color: #555;
+            margin-bottom: 15px;
+        }
+        .product-card button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s ease;
+        }
+        .product-card button:hover {
+            background: #0056b3;
+        }
+        .cart {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+        }
+        .cart h2 {
+            color: #2c3e50;
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+        }
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .cart-item:last-child {
+            border-bottom: none;
+        }
+        .cart-item button {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background 0.3s ease;
+        }
+        .cart-item button:hover {
+            background: #c82333;
+        }
+        .coupon-section {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+        .coupon-section input {
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
             width: 200px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
         }
-        .product-card img {
-            width: 100px;
-            height: auto;
+        .coupon-section input:focus {
+            border-color: #007bff;
+            outline: none;
         }
-        button {
+        .coupon-section button {
             padding: 10px 15px;
             background: #28a745;
             color: white;
             border: none;
+            border-radius: 8px;
             cursor: pointer;
-            border-radius: 5px;
+            font-size: 14px;
+            transition: background 0.3s ease;
         }
-        button:hover {
+        .coupon-section button:hover {
             background: #218838;
         }
         .order-btn {
             margin-top: 20px;
+            width: 100%;
+            padding: 15px;
             background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s ease;
         }
         .order-btn:hover {
             background: #0056b3;
         }
-        .cart {
-            margin-top: 20px;
-            padding: 10px;
-            background: #f9f9f9;
-            border-radius: 10px;
+        .custom-button {
+            display: inline-block;
+            margin-bottom: 20px;
+            padding: 10px 20px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 16px;
+            transition: background 0.3s ease;
+        }
+        .custom-button:hover {
+            background: #0056b3;
         }
     </style>
-    
     <script>
         emailjs.init("uO9ZiOSBCkDFXWLh4");
 
@@ -107,9 +203,16 @@
             { name: "Score 2022/23 zöld", price: 1800 },
             { name: "Pokember", price: 1550 },
             { name: "Cosmic Cards DC", price: 1700 },
-            
-
         ];
+
+        const couponCodes = {
+            "petyko": 0.01,   // 1%
+            "break": 0.005,   // 0.5%
+            "barca": 0.015,  // 1.5%
+            "real": 0.02     // 2%
+        };
+
+        let appliedCoupon = null;
 
         function addToCart(name, price) {
             cart.push({ name, price });
@@ -132,13 +235,47 @@
                     <button onclick='removeFromCart(${index})'>Törlés</button>
                 </div>`;
             });
+
+            let discount = 0;
+            if (total >= 10000) {
+                discount = total * 0.06;
+            } else if (total >= 5000) {
+                discount = total * 0.05;
+            }
+
+            if (appliedCoupon) {
+                let couponDiscount = total * appliedCoupon.discount;
+                discount += couponDiscount;
+                cartContainer.innerHTML += `<h3>Kuponkód (${appliedCoupon.code}): -${couponDiscount} Ft</h3>`;
+            }
+
+            let finalTotal = total - discount;
+
             cartContainer.innerHTML += `<h3>Összesen: ${total} Ft</h3>`;
+            if (discount > 0) {
+                cartContainer.innerHTML += `<h3>Kedvezmény: -${discount} Ft</h3>`;
+            }
+            cartContainer.innerHTML += `<h3>Fizetendő: ${finalTotal} Ft</h3>`;
         }
 
         function removeFromCart(index) {
             cart.splice(index, 1);
             localStorage.setItem("cart", JSON.stringify(cart));
             updateCartView();
+        }
+
+        function applyCoupon() {
+            let couponInput = document.getElementById("coupon-code").value;
+            if (couponCodes[couponInput]) {
+                appliedCoupon = {
+                    code: couponInput,
+                    discount: couponCodes[couponInput]
+                };
+                alert("Kuponkód sikeresen alkalmazva!");
+                updateCartView();
+            } else {
+                alert("Érvénytelen kuponkód!");
+            }
         }
 
         function sendOrder() {
@@ -156,9 +293,22 @@
             let cartData = cart.map(item => `${item.name} - ${item.price} Ft`).join("\n");
             let total = cart.reduce((sum, item) => sum + item.price, 0);
             
+            let discount = 0;
+            if (total >= 10000) {
+                discount = total * 0.06;
+            } else if (total >= 5000) {
+                discount = total * 0.05;
+            }
+
+            if (appliedCoupon) {
+                discount += total * appliedCoupon.discount;
+            }
+
+            let finalTotal = total - discount;
+
             let templateParams = {
                 user_name: customerName,
-                message: `Vásárló neve: ${customerName}\n\nRendelés:\n${cartData}\n\nÖsszesen: ${total} Ft`,
+                message: `Vásárló neve: ${customerName}\n\nRendelés:\n${cartData}\n\nÖsszesen: ${total} Ft\nKedvezmény: -${discount} Ft\nFizetendő: ${finalTotal} Ft`,
                 email: "petykopetyko3@gmail.com"
             };
             
@@ -167,6 +317,7 @@
                     alert("Rendelés elküldve!");
                     localStorage.removeItem("cart");
                     cart = [];
+                    appliedCoupon = null;
                     updateCartView();
                 }, error => {
                     alert("Hiba történt: " + error.text);
@@ -196,17 +347,17 @@
     </script>
 </head>
 <body>
-
-    <input type="text" id="search" onkeyup="searchProducts()" placeholder="Keresés termékek között..." class="search-box">
-    
-    <a href="https://petykoweb.github.io/bolt/" class="custom-button">Vissza a fő oldalra</a>
-    
     <div class="container">
         <h1>Webshop</h1>
+        <input type="text" id="search" onkeyup="searchProducts()" placeholder="Keresés termékek között..." class="search-box">
+        <a href="https://petykoweb.github.io/bolt/" class="custom-button">Vissza a fő oldalra</a>
         <div class="product-container"></div>
+        <div class="coupon-section">
+            <input type="text" id="coupon-code" placeholder="Kuponkód">
+            <button onclick="applyCoupon()">Kuponkód alkalmazása</button>
+        </div>
         <div id="cart" class="cart"></div>
         <button class="order-btn" onclick="sendOrder()">Rendelés leadása</button>
     </div>
-
 </body>
 </html>
