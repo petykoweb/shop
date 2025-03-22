@@ -221,29 +221,48 @@
         .purchase-mode button.active {
             background: #28a745;
         }
+        .featured-products {
+            margin-top: 20px;
+        }
+        .featured-products h3 {
+            text-align: center;
+            color: #2c3e50;
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+        }
+        .stock-section {
+            margin-top: 20px;
+        }
+        .stock-section h3 {
+            text-align: center;
+            color: #2c3e50;
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+        }
     </style>
     <script>
         emailjs.init("uO9ZiOSBCkDFXWLh4");
 
         let cart = JSON.parse(localStorage.getItem("cart")) || [];
         let products = [
-            { name: "mgk 2020/21", price: 1300 },
-            { name: "mgk 2021/22", price: 1100 },
-            { name: "Star Wars", price: 1200 },
-            { name: "Dragonball", price: 1500 },
-            { name: "Pokemon back to school", price: 4500 },
-            
-            { name: "Nba Hops box 2022/23", price: 16000 },
-            { name: "Super Stars", price: 1250 },
-            { name: "Topps Ucc", price: 15900 },
-            { name: "Liverpool fan set", price: 8900  },
-            { name: "Lorcana", price: 2350 },
-            { name: "Match Attax 101", price: 550 },
-            { name: "Topps Ucc 2022/23", price: 1500 },
-            { name: "Score kék 2021/22", price: 1700 },
-            { name: "Score 2022/23 zöld", price: 1800 },
-            { name: "Pokember", price: 1550 },
-            { name: "Cosmic Cards DC", price: 1700 },
+            { name: "mgk 2020/21", price: 1300, stock: 11 },
+            { name: "mgk 2021/22", price: 1100, stock: 6 },
+            { name: "Star Wars", price: 1200, stock: 5 },
+            { name: "Dragonball", price: 1500, stock: 8 },
+            { name: "Pokemon back to school", price: 4500, stock: 1 },
+            { name: "Nba Hops box 2022/23", price: 16000, stock: 1 },
+            { name: "Super Stars", price: 1250, stock: 5 },
+            { name: "Topps Ucc", price: 15900, stock: 1 },
+            { name: "Liverpool fan set", price: 8900, stock: 1 },
+            { name: "Lorcana", price: 2350, stock: 2 },
+            { name: "Match Attax 101", price: 550, stock: 7 },
+            { name: "Topps Ucc 2022/23", price: 1500, stock: 5 },
+            { name: "Score kék 2021/22", price: 1700, stock: 5 },
+            { name: "Score 2022/23 zöld", price: 1800, stock: 3 },
+            { name: "Pokember", price: 1550, stock: 2 },
+            { name: "Cosmic Cards DC", price: 1700, stock: 2 },
+            { name: "Pokemon ", price: 1675, stock: 6 },
+            { name: "Nfl", price: 1900, stock: 1 },
         ];
 
         const couponCodes = {
@@ -256,19 +275,30 @@
         let appliedCoupon = null;
         let purchaseMode = null; // 'live' vagy 'seller'
 
-        // Felhasználó szintje és kedvezményei
-        let userLevel = 0; // 0: Új vásárló, 1: Alkalmi gyűjtő, stb.
-        let userDiscount = 0; // Szint alapján kapott kedvezmény
-
         function addToCart(name, price) {
-            let itemCount = cart.filter(item => item.name === name).length;
-            if (itemCount >= 5) {
+            let item = cart.find(item => item.name === name);
+            let product = products.find(product => product.name === name);
+
+            if (item && item.quantity >= 5) {
                 alert("Maximum 5 db termék adható hozzá a kosárhoz!");
                 return;
             }
-            cart.push({ name, price });
+
+            if (product.stock <= 0) {
+                alert("Ez a termék nincs raktáron!");
+                return;
+            }
+
+            if (item) {
+                item.quantity += 1;
+            } else {
+                cart.push({ name, price, quantity: 1 });
+            }
+
+            product.stock -= 1;
             localStorage.setItem("cart", JSON.stringify(cart));
             updateCartView();
+            renderStock();
         }
 
         function updateCartView() {
@@ -280,9 +310,10 @@
             }
             let total = 0;
             cart.forEach((item, index) => {
-                total += item.price;
+                total += item.price * item.quantity;
                 cartContainer.innerHTML += `<div class='cart-item'>
-                    <span>${item.name} - ${item.price} Ft</span>
+                    <span>${item.name} - ${item.price} Ft x ${item.quantity}</span>
+                    <input type="number" value="${item.quantity}" min="1" max="5" onchange="updateQuantity(${index}, this.value)">
                     <button onclick='removeFromCart(${index})'>Törlés</button>
                 </div>`;
             });
@@ -303,11 +334,8 @@
                 couponDiscount = total * appliedCoupon.discount;
             }
 
-            // Felhasználó szintjének kedvezménye
-            let levelDiscount = total * userDiscount;
-
             // Összes kedvezmény
-            let totalDiscount = webDiscount + couponDiscount + levelDiscount;
+            let totalDiscount = webDiscount + couponDiscount;
             let finalTotal = total - totalDiscount;
 
             cartContainer.innerHTML += `<h3>Összesen: ${total} Ft</h3>`;
@@ -317,9 +345,6 @@
             if (couponDiscount > 0) {
                 cartContainer.innerHTML += `<h3>Kuponkód (${appliedCoupon.code}): -${couponDiscount} Ft</h3>`;
             }
-            if (levelDiscount > 0) {
-                cartContainer.innerHTML += `<h3>Szint kedvezmény (${userLevel}. szint): -${levelDiscount} Ft</h3>`;
-            }
             cartContainer.innerHTML += `<h3>Fizetendő: ${finalTotal} Ft</h3>`;
 
             // Kedvezmény sáv frissítése
@@ -327,9 +352,34 @@
         }
 
         function removeFromCart(index) {
+            let item = cart[index];
+            let product = products.find(product => product.name === item.name);
+            product.stock += item.quantity;
             cart.splice(index, 1);
             localStorage.setItem("cart", JSON.stringify(cart));
             updateCartView();
+            renderStock();
+        }
+
+        function updateQuantity(index, quantity) {
+            if (quantity > 5) {
+                alert("Maximum 5 db termék adható hozzá a kosárhoz!");
+                return;
+            }
+            let item = cart[index];
+            let product = products.find(product => product.name === item.name);
+            let difference = quantity - item.quantity;
+
+            if (product.stock - difference < 0) {
+                alert("Nincs elég raktáron!");
+                return;
+            }
+
+            item.quantity = parseInt(quantity);
+            product.stock -= difference;
+            localStorage.setItem("cart", JSON.stringify(cart));
+            updateCartView();
+            renderStock();
         }
 
         function applyCoupon() {
@@ -363,8 +413,8 @@
                 return;
             }
 
-            let cartData = cart.map(item => `${item.name} - ${item.price} Ft`).join("\n");
-            let total = cart.reduce((sum, item) => sum + item.price, 0);
+            let cartData = cart.map(item => `${item.name} - ${item.price} Ft x ${item.quantity}`).join("\n");
+            let total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
             // Webes kedvezmények
             let webDiscount = 0;
@@ -382,16 +432,13 @@
                 couponDiscount = total * appliedCoupon.discount;
             }
 
-            // Felhasználó szintjének kedvezménye
-            let levelDiscount = total * userDiscount;
-
             // Összes kedvezmény
-            let totalDiscount = webDiscount + couponDiscount + levelDiscount;
+            let totalDiscount = webDiscount + couponDiscount;
             let finalTotal = total - totalDiscount;
 
             let templateParams = {
                 user_name: customerName,
-                message: `Vásárló neve: ${customerName}\n\nRendelés:\n${cartData}\n\nÖsszesen: ${total} Ft\nWebes kedvezmény: -${webDiscount} Ft\nKuponkód kedvezmény: -${couponDiscount} Ft\nSzint kedvezmény: -${levelDiscount} Ft\nFizetendő: ${finalTotal} Ft\nVásárlási mód: ${purchaseMode === 'live' ? 'Élő adásban választom ki' : 'Eladó összerakja'}`,
+                message: `Vásárló neve: ${customerName}\n\nRendelés:\n${cartData}\n\nÖsszesen: ${total} Ft\nWebes kedvezmény: -${webDiscount} Ft\nKuponkód kedvezmény: -${couponDiscount} Ft\nFizetendő: ${finalTotal} Ft\nVásárlási mód: ${purchaseMode === 'live' ? 'Élő adásban választom ki' : 'Eladó összerakja'}`,
                 email: "petykopetyko3@gmail.com"
             };
 
@@ -417,6 +464,7 @@
                         <div class="product-card">
                             <h3>${product.name}</h3>
                             <p>Ár: ${product.price} Ft</p>
+                            <p>Raktáron: ${product.stock} db</p>
                             <button onclick="addToCart('${product.name}', ${product.price})">Kosárba</button>
                         </div>`;
                 }
@@ -457,9 +505,59 @@
             document.querySelector(`.purchase-mode button[data-mode="${mode}"]`).classList.add("active");
         }
 
+        function saveCart() {
+            localStorage.setItem("savedCart", JSON.stringify(cart));
+            alert("Kosár mentve!");
+        }
+
+        function loadCart() {
+            let savedCart = JSON.parse(localStorage.getItem("savedCart"));
+            if (savedCart) {
+                cart = savedCart;
+                updateCartView();
+                alert("Kosár betöltve!");
+            } else {
+                alert("Nincs mentett kosár!");
+            }
+        }
+
+        function renderFeaturedProducts() {
+            let featuredProducts = [
+                { name: "Pokemon back to school", price: 4500, stock: 15 },
+                { name: "Nba Hops box 2022/23", price: 16000, stock: 2 }
+            ];
+            let featuredContainer = document.querySelector(".featured-products .product-container");
+            featuredContainer.innerHTML = "";
+            featuredProducts.forEach(product => {
+                featuredContainer.innerHTML += `
+                    <div class="product-card">
+                        <h3>${product.name}</h3>
+                        <p>Ár: ${product.price} Ft</p>
+                        <p>Raktáron: ${product.stock} db</p>
+                        <button onclick="addToCart('${product.name}', ${product.price})">Kosárba</button>
+                    </div>`;
+            });
+        }
+
+        function renderStock() {
+            let stockContainer = document.querySelector(".stock-section .product-container");
+            stockContainer.innerHTML = "";
+            products.forEach(product => {
+                stockContainer.innerHTML += `
+                    <div class="product-card">
+                        <h3>${product.name}</h3>
+                        <p>Ár: ${product.price} Ft</p>
+                        <p>Raktáron: ${product.stock} db</p>
+                        <button onclick="addToCart('${product.name}', ${product.price})">Kosárba</button>
+                    </div>`;
+            });
+        }
+
         window.onload = function () {
             updateCartView();
             searchProducts();
+            renderFeaturedProducts();
+            renderStock();
         };
     </script>
 </head>
@@ -468,6 +566,14 @@
         <h1>Webshop</h1>
         <input type="text" id="search" onkeyup="searchProducts()" placeholder="Keresés termékek között..." class="search-box">
         <a href="https://petykoweb.github.io/bolt/" class="custom-button">Vissza a fő oldalra</a>
+        <div class="featured-products">
+            <h3>Kiemelt Termékek</h3>
+            <div class="product-container"></div>
+        </div>
+        <div class="stock-section">
+            <h3>Raktáron</h3>
+            <div class="product-container"></div>
+        </div>
         <div class="product-container"></div>
         <div class="purchase-mode">
             <button data-mode="live" onclick="setPurchaseMode('live')">Élő adásban választom ki</button>
@@ -483,6 +589,8 @@
             <div id="discount-text" class="discount-text"></div>
         </div>
         <button class="order-btn" onclick="sendOrder()">Rendelés leadása</button>
+        <button onclick="saveCart()">Kosár mentése</button>
+        <button onclick="loadCart()">Kosár betöltése</button>
     </div>
 </body>
 </html>
